@@ -22,6 +22,8 @@
     td { padding: 8px 12px; border-bottom: 1px solid #21262d; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
     .badge-filled { background: #238636; color: #fff; }
+    .badge-open { background: #58a6ff; color: #fff; }
+    .badge-cancelled { background: #6e7681; color: #fff; }
     .badge-paper { background: #9e6a03; color: #fff; }
     .badge-live { background: #da3633; color: #fff; }
     .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
@@ -30,6 +32,50 @@
     .analytics-card .value { font-size: 1.5rem; font-weight: 700; color: #58a6ff; }
     .analytics-card.win .value { color: #238636; }
     .analytics-card.loss .value { color: #da3633; }
+    
+    /* Trading Mode Toggle Styles */
+    .trading-mode-section { display: flex; align-items: center; gap: 24px; margin-bottom: 20px; padding: 16px; background: #0d1117; border-radius: 8px; border: 1px solid #30363d; }
+    .trading-mode-section h3 { font-size: 0.9rem; color: #e6edf3; }
+    .mode-toggle { display: flex; gap: 8px; }
+    .mode-btn { padding: 8px 20px; border-radius: 6px; border: 1px solid #30363d; background: #21262d; color: #8b949e; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
+    .mode-btn:hover { background: #30363d; }
+    .mode-btn.active.paper { background: #9e6a03; color: #fff; border-color: #9e6a03; }
+    .mode-btn.active.live { background: #da3633; color: #fff; border-color: #da3633; }
+    .mode-status { font-size: 0.8rem; color: #8b949e; }
+    
+    /* Percentage Trading Styles */
+    .percent-trade-section { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 16px; padding: 16px; background: #0d1117; border-radius: 8px; border: 1px solid #30363d; }
+    .percent-trade-section label { font-size: 0.85rem; color: #8b949e; }
+    .percent-trade-section input[type="number"] { width: 80px; padding: 8px 12px; border-radius: 6px; border: 1px solid #30363d; background: #21262d; color: #e6edf3; font-size: 0.9rem; }
+    .percent-trade-section input[type="number"]:focus { outline: none; border-color: #58a6ff; }
+    .percent-trade-section .percent-info { font-size: 0.75rem; color: #6e7681; }
+    
+    /* PnL Chart Styles */
+    .pnl-chart-container { position: relative; height: 250px; margin-bottom: 24px; background: #0d1117; border-radius: 8px; border: 1px solid #30363d; padding: 16px; }
+    .pnl-chart { width: 100%; height: 100%; }
+    
+    /* Terminal/Activity Log Styles */
+    .terminal-section { background: #010409; border: 1px solid #30363d; border-radius: 8px; padding: 16px; }
+    .terminal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #21262d; }
+    .terminal-header h3 { font-size: 0.9rem; color: #e6edf3; display: flex; align-items: center; gap: 8px; }
+    .terminal-header .live-indicator { display: inline-block; width: 8px; height: 8px; background: #238636; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .terminal-controls { display: flex; gap: 8px; }
+    .terminal-controls button { padding: 4px 12px; border-radius: 4px; border: 1px solid #30363d; background: #21262d; color: #8b949e; cursor: pointer; font-size: 0.75rem; }
+    .terminal-controls button:hover { background: #30363d; }
+    .terminal-log { height: 300px; overflow-y: auto; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.75rem; line-height: 1.5; }
+    .terminal-log .log-entry { padding: 4px 8px; border-radius: 4px; margin-bottom: 2px; }
+    .terminal-log .log-entry.info { color: #8b949e; }
+    .terminal-log .log-entry.trade { color: #58a6ff; background: rgba(88, 166, 255, 0.1); }
+    .terminal-log .log-entry.win { color: #238636; background: rgba(35, 134, 54, 0.1); }
+    .terminal-log .log-entry.loss { color: #da3633; background: rgba(218, 54, 51, 0.1); }
+    .terminal-log .log-entry.warn { color: #d29922; }
+    .terminal-log .log-entry.error { color: #f85149; background: rgba(248, 81, 73, 0.1); }
+    .terminal-log .timestamp { color: #6e7681; margin-right: 8px; }
+    
+    /* Dashboard Grid Layout */
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 1200px) { .dashboard-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -42,17 +88,71 @@
     <button onclick="showTab('analytics', this)">Analytics</button>
     <button onclick="showTab('positions', this)">Positions</button>
     <button onclick="showTab('trades', this)">Trades</button>
+    <button onclick="showTab('terminal', this)">Terminal</button>
     <button onclick="showTab('store', this)">Store</button>
   </nav>
 
   <main>
     <!-- Dashboard tab -->
     <div id="tab-dashboard" class="tab active">
+      <!-- Trading Mode Toggle -->
       <div class="card">
-        <h2>Live Stats</h2>
-        <p>Total Trades: <span id="stat-total">—</span></p>
-        <p>Open: <span id="stat-open">—</span> | Filled: <span id="stat-filled">—</span></p>
-        <p>Total PnL: <span id="stat-pnl">—</span> USDC</p>
+        <div class="trading-mode-section">
+          <h3>Trading Mode</h3>
+          <div class="mode-toggle">
+            <button id="mode-paper" class="mode-btn paper active" onclick="setTradingMode('paper')">📝 Paper</button>
+            <button id="mode-live" class="mode-btn live" onclick="setTradingMode('live')">🔴 Live</button>
+          </div>
+          <span class="mode-status">Currently: <strong id="current-mode">Paper</strong> mode • Changed <span id="mode-changed">—</span></span>
+        </div>
+        
+        <!-- Percentage Trading Setting -->
+        <div class="percent-trade-section">
+          <label>Trade Size:</label>
+          <input type="number" id="trade-percent" min="1" max="100" value="10" onchange="updateTradePercent(this.value)" />
+          <span>% of balance</span>
+          <span class="percent-info">(Current balance: <strong id="current-balance">—</strong> USDC • Trade size: <strong id="calculated-size">—</strong> USDC)</span>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <h2>Live Stats</h2>
+          <p>Total Trades: <span id="stat-total">—</span></p>
+          <p>Open: <span id="stat-open">—</span> | Filled: <span id="stat-filled">—</span></p>
+          <p>Paper Trades: <span id="stat-paper">—</span> | Live Trades: <span id="stat-live">—</span></p>
+          <p>Total PnL: <strong id="stat-pnl" style="font-size: 1.2rem;">—</strong> USDC</p>
+        </div>
+        
+        <!-- Win/Loss Summary -->
+        <div class="card">
+          <h2>Performance Summary</h2>
+          <div class="analytics-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="analytics-card win"><div class="label">Wins</div><div class="value" id="quick-wins">—</div></div>
+            <div class="analytics-card loss"><div class="label">Losses</div><div class="value" id="quick-losses">—</div></div>
+            <div class="analytics-card"><div class="label">Win Rate</div><div class="value" id="quick-winrate">—</div></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- PnL Chart -->
+      <div class="card">
+        <h2>PnL History Chart</h2>
+        <div class="pnl-chart-container">
+          <canvas id="pnl-chart" class="pnl-chart"></canvas>
+        </div>
+      </div>
+      
+      <!-- Activity Log Preview -->
+      <div class="card terminal-section">
+        <div class="terminal-header">
+          <h3><span class="live-indicator"></span> Bot Activity</h3>
+          <div class="terminal-controls">
+            <button onclick="clearTerminal()">Clear</button>
+            <button onclick="showTab('terminal', document.querySelector('nav button:nth-child(5)'))">Full Terminal →</button>
+          </div>
+        </div>
+        <div id="activity-log-preview" class="terminal-log" style="height: 150px;"></div>
       </div>
     </div>
 
@@ -99,6 +199,34 @@
       </div>
     </div>
 
+    <!-- Terminal tab (Full Log View) -->
+    <div id="tab-terminal" class="tab">
+      <div class="card terminal-section">
+        <div class="terminal-header">
+          <h3><span class="live-indicator"></span> Bot Terminal — Real-time Activity</h3>
+          <div class="terminal-controls">
+            <button onclick="clearTerminal()">Clear Log</button>
+            <button onclick="downloadLogs()">Download Logs</button>
+            <button onclick="toggleAutoScroll()">Auto-scroll: <span id="autoscroll-status">ON</span></button>
+          </div>
+        </div>
+        <div id="terminal-log" class="terminal-log" style="height: 500px;"></div>
+      </div>
+      
+      <div class="card">
+        <h2>Bot Decision Log</h2>
+        <p style="color: #8b949e; font-size: 0.85rem; margin-bottom: 12px;">
+          This terminal shows the bot's real-time decision-making process, including market analysis, edge calculations, and trade executions.
+        </p>
+        <div class="analytics-grid" style="grid-template-columns: repeat(4, 1fr);">
+          <div class="analytics-card"><div class="label">Markets Scanned</div><div class="value" id="markets-scanned">—</div></div>
+          <div class="analytics-card"><div class="label">Opportunities Found</div><div class="value" id="opportunities-found">—</div></div>
+          <div class="analytics-card"><div class="label">Trades Executed</div><div class="value" id="trades-executed">—</div></div>
+          <div class="analytics-card"><div class="label">Last Scan</div><div class="value" id="last-scan" style="font-size: 1rem;">—</div></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Store tab -->
     <div id="tab-store" class="tab">
       <div class="card">
@@ -110,7 +238,14 @@
 
   <script>
     const ADMIN_SECRET = 'change_me_in_production';
+    let autoScrollEnabled = true;
+    let activityLogs = [];
+    let pnlHistory = [];
+    let tradePercent = 10;
+    let currentBalance = 0;
+    let tradingModeState = { mode: 'paper', changedAt: Date.now(), changedBy: 'system' };
 
+    // ── Tab Navigation ─────────────────────────────────────────────────────────
     function showTab(name, btn) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -122,8 +257,10 @@
       if (name === 'store') loadStore();
     }
 
+    // ── WebSocket Connection ───────────────────────────────────────────────────
     const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
     const ws = new WebSocket(wsProtocol + '//' + location.host);
+    
     ws.addEventListener('message', ({ data }) => {
       try {
         const { event, data: payload } = JSON.parse(data);
@@ -131,10 +268,115 @@
           document.getElementById('stat-total').textContent = payload.totalTrades;
           document.getElementById('stat-open').textContent = payload.openTrades;
           document.getElementById('stat-filled').textContent = payload.filledTrades;
-          document.getElementById('stat-pnl').textContent = payload.totalPnl;
+          document.getElementById('stat-paper').textContent = payload.paperTrades || 0;
+          document.getElementById('stat-live').textContent = payload.liveTrades || 0;
+          const pnlEl = document.getElementById('stat-pnl');
+          pnlEl.textContent = (payload.totalPnl || 0).toFixed(2);
+          pnlEl.style.color = payload.totalPnl >= 0 ? '#238636' : '#da3633';
+        }
+        if (event === 'tradingMode') {
+          updateTradingModeUI(payload);
+        }
+        if (event === 'log') {
+          addLogEntry(payload);
+        }
+        if (event === 'trade') {
+          addTradeToHistory(payload);
         }
       } catch {}
     });
+
+    ws.addEventListener('open', () => {
+      addLogEntry({ type: 'info', message: 'Connected to bot WebSocket', timestamp: Date.now() });
+      loadTradingMode();
+      loadAnalyticsSummary();
+    });
+
+    ws.addEventListener('close', () => {
+      addLogEntry({ type: 'warn', message: 'WebSocket disconnected. Attempting to reconnect...', timestamp: Date.now() });
+    });
+
+    // ── Trading Mode Functions ─────────────────────────────────────────────────
+    async function loadTradingMode() {
+      try {
+        const res = await fetch('/api/trading-mode');
+        const data = await res.json();
+        updateTradingModeUI(data);
+      } catch (err) {
+        console.error('Failed to load trading mode:', err);
+      }
+    }
+
+    function updateTradingModeUI(state) {
+      tradingModeState = state;
+      const paperBtn = document.getElementById('mode-paper');
+      const liveBtn = document.getElementById('mode-live');
+      const currentModeEl = document.getElementById('current-mode');
+      const modeChangedEl = document.getElementById('mode-changed');
+      
+      paperBtn.classList.toggle('active', state.mode === 'paper');
+      liveBtn.classList.toggle('active', state.mode === 'live');
+      currentModeEl.textContent = state.mode === 'paper' ? 'Paper' : 'Live';
+      
+      const changedDate = new Date(state.changedAt);
+      modeChangedEl.textContent = formatTimeAgo(changedDate);
+    }
+
+    async function setTradingMode(mode) {
+      try {
+        const res = await fetch('/api/trading-mode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+          body: JSON.stringify({ mode })
+        });
+        const data = await res.json();
+        if (data.success) {
+          updateTradingModeUI(data.state);
+          addLogEntry({ type: 'info', message: `Trading mode changed to ${mode.toUpperCase()}`, timestamp: Date.now() });
+        } else {
+          addLogEntry({ type: 'error', message: `Failed to change mode: ${data.error}`, timestamp: Date.now() });
+        }
+      } catch (err) {
+        addLogEntry({ type: 'error', message: `Error changing trading mode: ${err.message}`, timestamp: Date.now() });
+      }
+    }
+
+    // ── Percentage Trading Functions ───────────────────────────────────────────
+    async function updateTradePercent(percent) {
+      tradePercent = Math.max(1, Math.min(100, parseInt(percent) || 10));
+      document.getElementById('trade-percent').value = tradePercent;
+      
+      // Update calculated size
+      const calculatedSize = (currentBalance * tradePercent / 100).toFixed(2);
+      document.getElementById('calculated-size').textContent = calculatedSize;
+      
+      // Save to server
+      try {
+        await fetch('/api/trade-percent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+          body: JSON.stringify({ percent: tradePercent })
+        });
+      } catch (err) {
+        console.error('Failed to save trade percent:', err);
+      }
+    }
+
+    // ── Analytics Functions ────────────────────────────────────────────────────
+    async function loadAnalyticsSummary() {
+      try {
+        const res = await fetch('/admin/analytics', { headers: { 'x-admin-secret': ADMIN_SECRET } });
+        const data = await res.json();
+        document.getElementById('quick-wins').textContent = data.winningTrades;
+        document.getElementById('quick-losses').textContent = data.losingTrades;
+        document.getElementById('quick-winrate').textContent = (data.winRate * 100).toFixed(1) + '%';
+        
+        // Load PnL chart data
+        loadPnLChart();
+      } catch (err) {
+        console.error('Failed to load analytics summary:', err);
+      }
+    }
 
     async function loadAnalytics() {
       const res = await fetch('/admin/analytics', { headers: { 'x-admin-secret': ADMIN_SECRET } });
@@ -172,13 +414,246 @@
         tbody.innerHTML = '<tr><td colspan="9">No trades</td></tr>';
         return;
       }
-      tbody.innerHTML = data.trades.map(t => `<tr><td>${t.id.slice(0,12)}…</td><td>${t.market.slice(0,10)}…</td><td>${t.side}</td><td>${t.outcome}</td><td>${t.price}</td><td>${t.size}</td><td><span class="badge badge-${t.status.toLowerCase()}">${t.status}</span></td><td><span class="badge ${t.paper ? 'badge-paper' : 'badge-live'}">${t.paper ? 'paper' : 'live'}</span></td><td>${t.pnl ?? '—'}</td></tr>`).join('');
+      tbody.innerHTML = data.trades.map(t => {
+        const pnlColor = (t.pnl || 0) >= 0 ? '#238636' : '#da3633';
+        const pnlValue = t.pnl !== undefined && t.pnl !== null ? t.pnl.toFixed(2) : '—';
+        return `<tr><td>${t.id.slice(0,12)}…</td><td>${t.market.slice(0,10)}…</td><td>${t.side}</td><td>${t.outcome}</td><td>${t.price}</td><td>${t.size}</td><td><span class="badge badge-${t.status.toLowerCase()}">${t.status}</span></td><td><span class="badge ${t.paper ? 'badge-paper' : 'badge-live'}">${t.paper ? 'paper' : 'live'}</span></td><td style="color: ${pnlColor}; font-weight: bold;">${pnlValue}</td></tr>`;
+      }).join('');
     }
 
     async function loadStore() {
       const res = await fetch('/admin/store', { headers: { 'x-admin-secret': ADMIN_SECRET } });
       document.getElementById('store-pre').textContent = JSON.stringify(await res.json(), null, 2);
     }
+
+    // ── PnL Chart Functions ────────────────────────────────────────────────────
+    async function loadPnLChart() {
+      try {
+        const res = await fetch('/admin/trades?limit=100', { headers: { 'x-admin-secret': ADMIN_SECRET } });
+        const data = await res.json();
+        
+        if (!data.trades || data.trades.length === 0) {
+          renderEmptyChart();
+          return;
+        }
+        
+        // Sort trades by timestamp
+        const trades = data.trades.sort((a, b) => a.timestamp - b.timestamp);
+        
+        // Calculate cumulative PnL
+        let cumPnl = 0;
+        pnlHistory = trades.map(t => {
+          cumPnl += (t.pnl || 0);
+          return { timestamp: t.timestamp, pnl: t.pnl || 0, cumPnl, isWin: (t.pnl || 0) > 0 };
+        });
+        
+        renderPnLChart();
+      } catch (err) {
+        console.error('Failed to load PnL chart:', err);
+        renderEmptyChart();
+      }
+    }
+
+    function renderPnLChart() {
+      const canvas = document.getElementById('pnl-chart');
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.parentElement.getBoundingClientRect();
+      
+      canvas.width = rect.width - 32;
+      canvas.height = rect.height - 32;
+      
+      if (pnlHistory.length === 0) {
+        renderEmptyChart();
+        return;
+      }
+      
+      const padding = { top: 20, right: 20, bottom: 40, left: 60 };
+      const chartWidth = canvas.width - padding.left - padding.right;
+      const chartHeight = canvas.height - padding.top - padding.bottom;
+      
+      const maxPnl = Math.max(...pnlHistory.map(p => p.cumPnl), 0);
+      const minPnl = Math.min(...pnlHistory.map(p => p.cumPnl), 0);
+      const range = maxPnl - minPnl || 1;
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw zero line
+      const zeroY = padding.top + chartHeight * (maxPnl / range);
+      ctx.strokeStyle = '#30363d';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(padding.left, zeroY);
+      ctx.lineTo(canvas.width - padding.right, zeroY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // Draw cumulative PnL line
+      ctx.strokeStyle = pnlHistory[pnlHistory.length - 1].cumPnl >= 0 ? '#238636' : '#da3633';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      
+      pnlHistory.forEach((point, i) => {
+        const x = padding.left + (i / (pnlHistory.length - 1 || 1)) * chartWidth;
+        const y = padding.top + chartHeight * ((maxPnl - point.cumPnl) / range);
+        
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+      ctx.stroke();
+      
+      // Draw win/loss dots
+      pnlHistory.forEach((point, i) => {
+        const x = padding.left + (i / (pnlHistory.length - 1 || 1)) * chartWidth;
+        const y = padding.top + chartHeight * ((maxPnl - point.cumPnl) / range);
+        
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = point.isWin ? '#238636' : '#da3633';
+        ctx.fill();
+      });
+      
+      // Draw axes labels
+      ctx.fillStyle = '#8b949e';
+      ctx.font = '11px system-ui';
+      ctx.textAlign = 'right';
+      ctx.fillText(maxPnl.toFixed(2), padding.left - 8, padding.top + 4);
+      ctx.fillText(minPnl.toFixed(2), padding.left - 8, canvas.height - padding.bottom);
+      ctx.fillText('0', padding.left - 8, zeroY + 4);
+      
+      ctx.textAlign = 'center';
+      ctx.fillText('USDC', 30, canvas.height / 2);
+      ctx.fillText(`${pnlHistory.length} trades`, canvas.width / 2, canvas.height - 10);
+    }
+
+    function renderEmptyChart() {
+      const canvas = document.getElementById('pnl-chart');
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.parentElement.getBoundingClientRect();
+      
+      canvas.width = rect.width - 32;
+      canvas.height = rect.height - 32;
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#6e7681';
+      ctx.font = '14px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('No trade data available', canvas.width / 2, canvas.height / 2);
+    }
+
+    // ── Terminal/Activity Log Functions ────────────────────────────────────────
+    function addLogEntry(entry) {
+      const log = {
+        type: entry.type || 'info',
+        message: entry.message,
+        timestamp: entry.timestamp || Date.now()
+      };
+      
+      activityLogs.push(log);
+      if (activityLogs.length > 500) {
+        activityLogs.shift();
+      }
+      
+      renderLogEntry(log, 'terminal-log');
+      renderLogEntry(log, 'activity-log-preview');
+    }
+
+    function renderLogEntry(log, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${log.type}`;
+      
+      const time = new Date(log.timestamp).toLocaleTimeString();
+      entry.innerHTML = `<span class="timestamp">[${time}]</span>${escapeHtml(log.message)}`;
+      
+      container.appendChild(entry);
+      
+      // Limit entries in preview
+      if (containerId === 'activity-log-preview') {
+        while (container.children.length > 20) {
+          container.removeChild(container.firstChild);
+        }
+      }
+      
+      // Auto-scroll
+      if (autoScrollEnabled) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+
+    function clearTerminal() {
+      activityLogs = [];
+      document.getElementById('terminal-log').innerHTML = '';
+      document.getElementById('activity-log-preview').innerHTML = '';
+      addLogEntry({ type: 'info', message: 'Terminal cleared', timestamp: Date.now() });
+    }
+
+    function toggleAutoScroll() {
+      autoScrollEnabled = !autoScrollEnabled;
+      document.getElementById('autoscroll-status').textContent = autoScrollEnabled ? 'ON' : 'OFF';
+    }
+
+    function downloadLogs() {
+      const logText = activityLogs.map(l => {
+        const time = new Date(l.timestamp).toISOString();
+        return `[${time}] [${l.type.toUpperCase()}] ${l.message}`;
+      }).join('\n');
+      
+      const blob = new Blob([logText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `polymarketbot-logs-${new Date().toISOString().slice(0, 10)}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function addTradeToHistory(trade) {
+      const type = (trade.pnl || 0) > 0 ? 'win' : (trade.pnl || 0) < 0 ? 'loss' : 'trade';
+      const pnlStr = trade.pnl !== undefined ? ` (PnL: ${trade.pnl.toFixed(2)} USDC)` : '';
+      addLogEntry({ 
+        type, 
+        message: `${trade.paper ? '📝' : '🔴'} ${trade.side} ${trade.size} ${trade.outcome} @ ${trade.price}${pnlStr}`, 
+        timestamp: trade.timestamp 
+      });
+      
+      // Update quick stats and chart
+      loadAnalyticsSummary();
+    }
+
+    // ── Utility Functions ──────────────────────────────────────────────────────
+    function formatTimeAgo(date) {
+      const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+      if (seconds < 60) return 'just now';
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+      if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+      return `${Math.floor(seconds / 86400)}d ago`;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ── Initialization ─────────────────────────────────────────────────────────
+    window.addEventListener('resize', () => {
+      if (pnlHistory.length > 0) {
+        renderPnLChart();
+      }
+    });
+
+    // Load initial data
+    loadAnalyticsSummary();
+    loadTradingMode();
+
+    // Add startup log entry
+    addLogEntry({ type: 'info', message: 'Dashboard initialized. Waiting for bot activity...', timestamp: Date.now() });
   </script>
 </body>
 </html>
