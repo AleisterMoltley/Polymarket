@@ -1,6 +1,30 @@
-# 🤠 Polymarket Trading Bot - The "Even My Grandma Could Do This" Guide
+# 🤠🎮 BUBBA'S POLY-TRADIN' MACHINE 🎮🤠
+## *An 8-BIT HILLBILLY ADVENTURE in AUTOMATED BETTIN'!*
 
-## Howdy, Partner! 👋
+```
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  ████  █  █  ████  ████   ██   ██  ███    ████  ████  ██████ ║
+    ║  █  █  █  █  █  █  █  █  █  █ █  █ █  █   █  █  █  █    ██   ║
+    ║  ████  █  █  ████  ████  ████ █  █ █████  ████  █  █    ██   ║
+    ║  █  █  █  █  █  █  █  █  █  █ █  █ █   █  █  █  █  █    ██   ║
+    ║  ████  ████  ████  ████  █  █  ██  ███ █  ████  ████    ██   ║
+    ╚══════════════════════════════════════════════════════════════╝
+              🐔 YEEHAW! AUTOMATED MARKET BETTIN' 🐔
+```
+
+## 🌾 Howdy, Partner! Welcome to the Digital Barn! 👋
+
+```
+     __________
+    |  ____    |     🌾 WELCOME TO BUBBA'S 🌾
+    | |    |   |    POLY-TRADIN' MACHINE!
+    | |____|   |   Even yer grandpappy could 
+    |    __    |     use this here contraption!
+    |   |  |   |
+    |___|__|___|
+       /    \
+      /______\        🐷🐄🐔 FARM FRESH CODE 🐔🐄🐷
+```
 
 So, ya wanna get this fancy computer thingy runnin' on yer Mac? Don't you worry your pretty little head about it! I'm gonna walk ya through this like we're buildin' a birdhouse together - one piece at a time, nice and easy!
 
@@ -9,6 +33,22 @@ So, ya wanna get this fancy computer thingy runnin' on yer Mac? Don't you worry 
 ---
 
 ## 📖 Table of Contents (What We're Gonna Do Today)
+
+```
+┌─────────────────────────────────────────┐
+│  🎮 8-BIT NAVIGATION MENU 🎮             │
+├─────────────────────────────────────────┤
+│  [1] ► WHAT IS THIS THING?              │
+│  [2] ► OPEN THE MAGIC BOX (Terminal)    │
+│  [3] ► GET HOMEBREW (Nerd App Store)    │
+│  [4] ► GET NODE.JS (The Engine)         │
+│  [5] ► DOWNLOAD THE CODE                │
+│  [6] ► SET IT UP                        │
+│  [7] ► LET 'ER RIP!                     │
+│  [8] ► KEEPIN' IT FRESH                 │
+│  [9] ► WHEN THINGS GO SIDEWAYS          │
+└─────────────────────────────────────────┘
+```
 
 1. [What Even IS This Thing?](#-what-even-is-this-thing)
 2. [First Things First - Opening the Magic Black Box (Terminal)](#-first-things-first---opening-the-magic-black-box-terminal)
@@ -24,6 +64,17 @@ So, ya wanna get this fancy computer thingy runnin' on yer Mac? Don't you worry 
 
 ## 🤔 What Even IS This Thing?
 
+```
+    🤖 THE BOT           💰 POLYMARKET          📊 YER PROFITS
+    ┌─────────┐          ┌─────────┐          ┌─────────┐
+    │  ◉   ◉  │   ───►   │ $ $ $ $ │   ───►   │  💵💵💵  │
+    │    ▽    │          │ $ $ $ $ │          │  💵💵💵  │
+    │  \___/  │          │ $ $ $ $ │          │  💵💵💵  │
+    └─────────┘          └─────────┘          └─────────┘
+       WATCHES              BETS               WINNIN'S!
+       MARKETS             MARKET             (hopefully)
+```
+
 Alright, imagine you got a really smart robot friend who watches the betting markets for ya while you're out fishin' or nappin' on the porch.
 
 **This bot:**
@@ -33,44 +84,86 @@ Alright, imagine you got a really smart robot friend who watches the betting mar
 
 Think of it like having a very attentive squirrel who never sleeps and is REALLY good at math!
 
-> ⚠️ **IMPORTANT WARNING - PLEASE READ!** ⚠️
-> 
-> When you use "Live Trading" mode, **you're using REAL MONEY!** Just like gambling at a casino, you can LOSE money. Please:
-> - 🎓 **Learn first** - Use "Paper Trading" mode to practice (no real money!)
-> - 💸 **Only bet what you can afford to lose** - Never use rent money or savings!
-> - 🧠 **Understand the risks** - Trading is risky business, y'all!
-> - 👨‍👩‍👧 **If you're a kid** - Get your parents' permission and help first!
+```
+╔═══════════════════════════════════════════════════════════════════════╗
+║  ⚠️  IMPORTANT WARNING - READ THIS OR REGRET IT LATER!  ⚠️           ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║                                                                       ║
+║  When you use "Live Trading" mode, you're using REAL MONEY!           ║
+║  Just like gambling at a casino, you can LOSE money. Please:          ║
+║                                                                       ║
+║  🎓 LEARN FIRST - Use "Paper Trading" mode to practice!               ║
+║  💸 BET SMART - Only bet what you can afford to lose!                 ║
+║  🧠 UNDERSTAND - Trading is risky business, y'all!                    ║
+║  👨‍👩‍👧 YOUNG'UNS - Get yer parents' permission first!                   ║
+║                                                                       ║
+║     "Don't bet the farm on somethin' you don't understand!"           ║
+║                                          - Grandpappy Bubba, 1892     ║
+╚═══════════════════════════════════════════════════════════════════════╝
+```
 
 ---
 
-## 🎛️ Dashboard Features
+## 🎛️ Dashboard Features (The Control Panel)
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│  🎮 BUBBA'S TRADIN' DASHBOARD 🎮                               │
+├────────────────────────────────────────────────────────────────┤
+│                                                                │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐        │
+│  │ 📝 PRACTICIN │  │ 🔥 FER REAL  │  │ 💰 BALANCE   │        │
+│  │   [ACTIVE]   │  │              │  │   $1,337     │        │
+│  └──────────────┘  └──────────────┘  └──────────────┘        │
+│                                                                │
+│  ═══════════════ STATS ═══════════════                        │
+│  🎉 WINS: 42     😢 LOSSES: 13     📈 WIN RATE: 76%           │
+│                                                                │
+│  ═══════════════ CHART ═══════════════                        │
+│       📈                                                       │
+│      /  \    /\                                                │
+│     /    \  /  \  /\                                          │
+│    /      \/    \/  \                                         │
+│  ─────────────────────────────────────                        │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+```
 
 The bot comes with a fancy web dashboard where you can control everything! Here's what you can do:
 
-![Dashboard Trading Settings](https://github.com/user-attachments/assets/de7d7545-18df-4aba-bc05-12b57f4cfdea)
+### 🎮 Trading Mode Toggle
+- **📝 Practicin' Mode**: Practice trading without real money (recommended for beginners!)
+- **🔥 Fer Real Mode**: Real trading with real money (be careful, partner!)
 
-### Trading Mode Toggle
-- **📝 Paper Mode**: Practice trading without real money (recommended for beginners!)
-- **🔴 Live Mode**: Real trading with real money (be careful!)
+### 🐷 Trading Settings
 
-### Trading Settings
+| Setting | What It Does |
+|---------|--------------|
+| **🐷 Bet Size %** | What percentage of yer piggy bank to use per trade (1-100%) |
+| **🚜 Max Bet** | Maximum USDC per trade - hard limit that overrides the percentage |
+| **🌽 Min Bet** | Skip trades below this amount (ain't worth the hassle) |
+| **🛑 Stop-Loss** | Pack it up and go home if you lose this much in a day (0 = YOLO mode) |
 
-| Setting | Description |
-|---------|-------------|
-| **Trade Size %** | What percentage of your balance to use per trade (1-100%) |
-| **Max Position Size** | Maximum USDC per trade - hard limit that overrides the percentage |
-| **Min Trade Size** | Skip trades below this amount (avoid dust trades) |
-| **Daily Loss Limit** | Stop trading automatically if you lose this much in a day (0 = disabled) |
-
-### Other Dashboard Features
-- 📊 **Live Stats**: See total trades, open/filled orders, paper vs live trades
-- 📈 **Performance Summary**: Wins, losses, and win rate at a glance
-- 📉 **PnL History Chart**: Visual chart of your profit/loss over time
-- 🖥️ **Terminal**: Real-time bot activity log
+### 🏠 Other Dashboard Features
+- 📊 **The Tally Board**: See total trades, open/filled orders, paper vs live trades
+- 🏆 **How We're Doin'**: Wins, losses, and win rate at a glance
+- 📈 **Money Mountain**: Visual chart of your profit/loss over time
+- 💻 **Command Shack**: Real-time bot activity log (like a crystal ball but with more text)
 
 ---
 
 ## 💻 First Things First - Opening the Magic Black Box (Terminal)
+
+```
+    ┌──────────────────────────────────────────┐
+    │ $ THE TERMINAL - YER NEW BEST FRIEND    │
+    │ ─────────────────────────────────────── │
+    │                                          │
+    │ yourname@mac ~ % _                       │
+    │                                          │
+    │ (That blinky thing means it's listenin'!)│
+    └──────────────────────────────────────────┘
+```
 
 The **Terminal** is like a text-message conversation with your computer. Instead of clicking buttons, you TYPE what you want it to do. Scary? Nah! It's actually pretty fun once ya get the hang of it!
 
@@ -98,6 +191,23 @@ That blinking cursor? That's your computer sayin' "I'm listenin', what do ya wan
 ---
 
 ## 🍺 Installing Homebrew - The App Store for Nerds
+
+```
+    🍺 HOMEBREW 🍺
+    ══════════════
+    
+    Like the app store,
+    but for nerdy stuff!
+    
+    ┌────────────────┐
+    │   HOMEBREW     │
+    │  ┌──────────┐  │
+    │  │  🍺  🍺  │  │
+    │  │  🍺  🍺  │  │
+    │  │__________│  │
+    │  [INSTALL IT]  │
+    └────────────────┘
+```
 
 **Homebrew** is like the App Store, but for programmer stuff. It lets you install things by just typing a command. Pretty neat, huh?
 
@@ -150,11 +260,24 @@ If you see something like `Homebrew 4.x.x` - **YEEHAW! 🤠 It worked!**
 
 ## 🟢 Installing Node.js - The Engine That Makes It Go Vroom
 
-**Node.js** is like the engine in a truck. Without it, the truck (our bot) ain't goin' nowhere!
+```
+    🚜 NODE.JS - THE ENGINE 🚜
+    ══════════════════════════
+    
+         ___________
+        |  _______  |
+        | |       | |
+        | | NODE  | |====► VROOM VROOM!
+        | |_______| |
+        |___________|
+           O    O
+```
+
+**Node.js** is like the engine in a tractor. Without it, the tractor (our bot) ain't goin' nowhere!
 
 ### Step 1: Install NVM (Node Version Manager) First
 
-NVM lets you install different versions of Node.js easily. It's like having a key ring with different keys for different trucks!
+NVM lets you install different versions of Node.js easily. It's like having a key ring with different keys for different tractors!
 
 **Copy-paste this into Terminal:**
 
@@ -202,6 +325,19 @@ You should see something like `v20.x.x`. If you do - **HOT DIGGITY DOG! 🌭 You
 
 ## 📥 Getting the Code - Like Downloading a Recipe
 
+```
+    📥 DOWNLOAD THE CODE 📥
+    ═══════════════════════
+    
+    INTERNET ──────► YOUR COMPUTER
+    
+    ┌─────────┐     ┌─────────┐
+    │ GITHUB  │ ►►► │  YOUR   │
+    │ 🐙      │     │  MAC    │
+    │ (code)  │     │  💻     │
+    └─────────┘     └─────────┘
+```
+
 Now we need to download the actual bot code. It's like getting a recipe before you can cook!
 
 ### Step 1: Install Git (If You Don't Have It)
@@ -248,6 +384,21 @@ ls
 
 ## 🔧 Setting Things Up - Putting the Pieces Together
 
+```
+    🔧 SETUP TIME 🔧
+    ═══════════════
+    
+    STEP 1: Get the groceries (npm install)
+    STEP 2: Copy the settings (.env)
+    STEP 3: Customize it (edit .env)
+    
+    ┌────────────────────┐
+    │  📦 INSTALLING...  │
+    │  ████████░░░░ 67%  │
+    │  Hang tight, y'all │
+    └────────────────────┘
+```
+
 ### Step 1: Install Dependencies (The Bot's Groceries)
 
 The bot needs some extra stuff to work. Let's get 'em:
@@ -291,6 +442,24 @@ You'll see a bunch of settings. Don't worry if you don't understand everything! 
 
 ## 🚀 Running the Bot - Let 'Er Rip!
 
+```
+    🚀 LAUNCH TIME! 🚀
+    ══════════════════
+    
+         🤠
+        /|\\
+        / \\
+    ───────────────
+    READY TO TRADE!
+    
+    ┌──────────────────────────┐
+    │  STATUS: 🟢 RUNNIN'      │
+    │  MODE:   📝 PRACTICIN'   │
+    │  TRADES: 0               │
+    │  PnL:    $0.00           │
+    └──────────────────────────┘
+```
+
 Alright, moment of truth! Let's fire this bad boy up!
 
 ### For Development (Testing Things Out):
@@ -317,15 +486,25 @@ You should see some text saying the server is running! Open your web browser and
 
 **http://localhost:3000**
 
-You'll see the fancy dashboard! 
+You'll see the fancy 8-bit hillbilly dashboard! 
 
-**CONGRATULATIONS! You did it! 🎊🎉🥳**
+```
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║   🎉🤠 CONGRATULATIONS, PARTNER! YOU DID IT! 🤠🎉             ║
+║                                                               ║
+║   The dashboard should now be showin' in yer browser!         ║
+║   It's got all sorts of fancy 8-bit graphics and              ║
+║   hillbilly charm, just like grandma used to make!            ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+```
 
 ---
 
 ## 🔄 Updating Everything - Keeping It Fresh
 
-Just like your truck needs oil changes, your computer stuff needs updates too!
+Just like your tractor needs oil changes, your computer stuff needs updates too!
 
 ### Updating Homebrew:
 
@@ -368,6 +547,21 @@ npm install -g npm@latest
 ---
 
 ## 🆘 Troubleshooting - When Things Go Sideways
+
+```
+    🆘 HELP! SOMETHIN' BROKE! 🆘
+    ════════════════════════════
+    
+    Don't panic! Here's what to try:
+    
+    ┌────────────────────────────┐
+    │ 1. Did ya spell it right?  │
+    │ 2. Try turnin' it off      │
+    │    and on again            │
+    │ 3. Read the error message  │
+    │ 4. Ask fer help!           │
+    └────────────────────────────┘
+```
 
 Don't panic! Here are fixes for common problems:
 
@@ -441,25 +635,56 @@ PORT=3001 npm run dev
 
 ## 📚 Quick Command Cheat Sheet (Keep This Handy!)
 
-| What You Wanna Do | What to Type |
-|-------------------|--------------|
-| Open home folder | `cd ~` |
-| Open bot folder | `cd ~/Polymarket` |
-| See what's in a folder | `ls` |
-| Install bot stuff | `npm install` |
-| Run in dev mode | `npm run dev` |
-| Build for production | `npm run build` |
-| Run production | `npm start` |
-| Stop the bot | Press `Control` + `C` |
-| Update Homebrew | `brew update && brew upgrade` |
-| Update Node.js | `nvm install 20 --latest` |
-| Check Node version | `node --version` |
-| Check npm version | `npm --version` |
-| Pull latest code | `git pull` |
+```
+┌──────────────────────────────────────────────────────────────┐
+│  🎮 BUBBA'S COMMAND CHEAT SHEET 🎮                           │
+├──────────────────────────────────────────────────────────────┤
+│  WHAT YA WANNA DO          │  WHAT TO TYPE                  │
+├────────────────────────────┼─────────────────────────────────┤
+│  Go home                   │  cd ~                          │
+│  Go to bot folder          │  cd ~/Polymarket               │
+│  See what's here           │  ls                            │
+│  Install bot stuff         │  npm install                   │
+│  Run in dev mode           │  npm run dev                   │
+│  Build for production      │  npm run build                 │
+│  Run production            │  npm start                     │
+│  Stop the bot              │  Control + C                   │
+│  Update Homebrew           │  brew update && brew upgrade   │
+│  Update Node.js            │  nvm install 20 --latest       │
+│  Check Node version        │  node --version                │
+│  Check npm version         │  npm --version                 │
+│  Pull latest code          │  git pull                      │
+└────────────────────────────┴─────────────────────────────────┘
+```
 
 ---
 
 ## 🌟 You Did It!
+
+```
+    ╔═══════════════════════════════════════════════════════════╗
+    ║                                                           ║
+    ║   🏆 ACHIEVEMENT UNLOCKED: TECH SAVVY HILLBILLY! 🏆       ║
+    ║                                                           ║
+    ║      You went from "what's a terminal?" to running        ║
+    ║      a full-blown trading bot! Grandpappy would be        ║
+    ║      so proud! 🤠                                         ║
+    ║                                                           ║
+    ║   ┌─────────────────────────────────────────────────┐    ║
+    ║   │                                                 │    ║
+    ║   │    Remember:                                    │    ║
+    ║   │    🐢 Take it slow                              │    ║
+    ║   │    📖 Read error messages                       │    ║
+    ║   │    🔄 When in doubt, restart                    │    ║
+    ║   │    ❓ Questions are good!                       │    ║
+    ║   │                                                 │    ║
+    ║   └─────────────────────────────────────────────────┘    ║
+    ║                                                           ║
+    ║   Now go on, you beautiful genius, and may your           ║
+    ║   trades be ever in your favor! 🍀                        ║
+    ║                                                           ║
+    ╚═══════════════════════════════════════════════════════════╝
+```
 
 Look at you! You went from "what's a terminal?" to running a full-blown trading bot! 
 
@@ -482,8 +707,18 @@ Now go on, you beautiful genius, and may your trades be ever in your favor! 🍀
 
 <div align="center">
 
-**Made with 💖 for folks who think computers are scary (they're not!)**
+```
+    🐔🐷🐄🌾🌽🚜🏚️🎸🤠💰📊🎮
+```
+
+**Made with 💖 by hillbillies, for hillbillies!**
 
 *"The only stupid question is the one you don't ask!"*
+*- Ancient Hillbilly Proverb*
+
+```
+    Press [SPACE] to continue...
+    or [Q] to quit and go fishin' 🎣
+```
 
 </div>
