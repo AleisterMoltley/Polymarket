@@ -225,25 +225,6 @@ export function broadcast(event: string, data: unknown): void {
   });
 }
 
-/** Broadcast a log message to all connected clients. */
-export function broadcastLog(type: "info" | "warn" | "error" | "trade" | "win" | "loss", message: string): void {
-  broadcast("log", { type, message, timestamp: Date.now() });
-}
-
-/** Broadcast a trade event to all connected clients. */
-export function broadcastTrade(trade: {
-  id: string;
-  side: string;
-  outcome: string;
-  price: number;
-  size: number;
-  paper: boolean;
-  pnl?: number;
-  timestamp: number;
-}): void {
-  broadcast("trade", trade);
-}
-
 // Auto-broadcast stats to all connected clients
 let statsBroadcastTimer: NodeJS.Timeout | null = null;
 

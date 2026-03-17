@@ -138,8 +138,8 @@ export async function evaluateAndTrade(market: Market): Promise<void> {
       console.log("[trading] Could not get balance for percentage sizing, using default max");
     }
   } else {
-    // For paper trading, use a simulated balance of 1000 USDC
-    const simulatedBalance = 1000;
+    // For paper trading, use a simulated balance (configurable via env)
+    const simulatedBalance = parseFloat(process.env.PAPER_TRADING_BALANCE ?? "1000");
     const percentSize = (simulatedBalance * tradePercent) / 100;
     effectiveMaxSize = Math.min(percentSize, maxSize);
     console.log(`[trading] Paper balance: ${simulatedBalance} USDC (simulated), Trade percent: ${tradePercent}%, Effective max: ${effectiveMaxSize.toFixed(2)} USDC`);
@@ -172,15 +172,15 @@ export async function evaluateAndTrade(market: Market): Promise<void> {
     const size = Math.min(effectiveMaxSize, Math.round(edge * effectiveMaxSize * 100) / 100);
     
     // Calculate simulated PnL for paper trades (for better visualization)
-    // PnL = size * (1 - price) if trade wins, or -size if trade loses
-    // For now, simulate based on random outcome with slight edge
-    const simulatedPnl = isPaper ? calculateSimulatedPnL(size, price, edge) : undefined;
+    // Uses deterministic calculation based on timestamp for reproducible results
+    const tradeTimestamp = Date.now();
+    const simulatedPnl = isPaper ? calculateSimulatedPnL(size, price, edge, tradeTimestamp) : undefined;
 
     console.log(`[${isPaper ? 'paper' : 'live'}-trade] BUY ${size} USDC of "${outcome}" @ ${price}${simulatedPnl !== undefined ? ` (simulated PnL: ${simulatedPnl.toFixed(2)})` : ''}`);
 
     recordTrade({
       id: newId(),
-      timestamp: Date.now(),
+      timestamp: tradeTimestamp,
       market: market.question,
       outcome,
       side: "BUY",
@@ -195,17 +195,21 @@ export async function evaluateAndTrade(market: Market): Promise<void> {
 
 /**
  * Calculate simulated PnL for paper trades.
- * Uses a probability model based on edge to determine win/loss.
+ * Uses a deterministic probability model based on edge and timestamp
+ * to determine win/loss for reproducible results.
  */
-function calculateSimulatedPnL(size: number, price: number, edge: number): number {
+function calculateSimulatedPnL(size: number, price: number, edge: number, timestamp?: number): number {
+  // Use timestamp for deterministic randomness (allows reproducible results)
+  const seed = timestamp ?? Date.now();
+  const pseudoRandom = ((seed * 9301 + 49297) % 233280) / 233280;
+  
   // Higher edge = higher probability of winning
   // Base win probability is 50%, adjusted by edge
   const winProbability = Math.min(0.5 + edge, 0.9); // Cap at 90%
-  const isWinner = Math.random() < winProbability;
+  const isWinner = pseudoRandom < winProbability;
   
   if (isWinner) {
     // Won the trade: profit is size * (1/price - 1) for binary markets
-    // Simplified: profit ~ size * edge (conservative estimate)
     return Math.round(size * (1 / price - 1) * 100) / 100;
   } else {
     // Lost the trade: lose the position value

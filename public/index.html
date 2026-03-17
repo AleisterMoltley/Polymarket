@@ -237,6 +237,9 @@
   </main>
 
   <script>
+    // NOTE: This admin secret provides minimal security and is visible in browser source.
+    // For production, implement proper session-based authentication.
+    // This is only used for basic API protection during development/demo.
     const ADMIN_SECRET = 'change_me_in_production';
     let autoScrollEnabled = true;
     let activityLogs = [];
