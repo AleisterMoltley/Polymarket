@@ -147,20 +147,20 @@ source ~/.zshrc
 
 OR just close Terminal completely and open it again!
 
-### Step 3: Install Node.js Version 25
+### Step 3: Install Node.js Version 20 (LTS)
 
-This bot needs Node.js version 25 or newer. Let's get it!
+This bot needs Node.js version 20 or newer. We'll use the LTS (Long Term Support) version because it's the most stable!
 
 ```bash
-nvm install 25
+nvm install 20
 ```
 
 Wait for it to download and install (might take a minute or two).
 
-### Step 4: Tell Your Computer to Use Node 25
+### Step 4: Tell Your Computer to Use Node 20
 
 ```bash
-nvm use 25
+nvm use 20
 ```
 
 ### Step 5: Check If It Worked! ✅
@@ -169,7 +169,7 @@ nvm use 25
 node --version
 ```
 
-You should see something like `v25.x.x`. If you do - **HOT DIGGITY DOG! 🌭 You're doin' great!**
+You should see something like `v20.x.x`. If you do - **HOT DIGGITY DOG! 🌭 You're doin' great!**
 
 ---
 
@@ -311,8 +311,8 @@ This updates Homebrew AND all the stuff you installed with it!
 ### Updating Node.js:
 
 ```bash
-nvm install 25 --latest
-nvm use 25
+nvm install 20 --latest
+nvm use 20
 ```
 
 ### Updating the Bot Code:
@@ -368,7 +368,7 @@ Or close Terminal and open it again!
 You need to tell your terminal to use the node version:
 
 ```bash
-nvm use 25
+nvm use 20
 ```
 
 ### "Permission denied" Errors
@@ -385,9 +385,9 @@ source ~/.zshrc
 
 **Option 2 - Reinstall Node.js with NVM:**
 ```bash
-nvm uninstall 25
-nvm install 25
-nvm use 25
+nvm uninstall 20
+nvm install 20
+nvm use 20
 ```
 
 > ⚠️ **Note:** Avoid using `sudo` with npm - it can cause more problems than it solves!
@@ -425,7 +425,7 @@ PORT=3001 npm run dev
 | Run production | `npm start` |
 | Stop the bot | Press `Control` + `C` |
 | Update Homebrew | `brew update && brew upgrade` |
-| Update Node.js | `nvm install 25 --latest` |
+| Update Node.js | `nvm install 20 --latest` |
 | Check Node version | `node --version` |
 | Check npm version | `npm --version` |
 | Pull latest code | `git pull` |
