@@ -34,6 +34,13 @@ const PORT = parseInt(process.env.PORT ?? "3000", 10);
 const STATS_BROADCAST_INTERVAL = parseInt(process.env.STATS_BROADCAST_INTERVAL_MS ?? "10000", 10);
 const SHUTDOWN_TIMEOUT_MS = 10000; // Force shutdown after 10 seconds
 
+// ── Trading Settings Defaults ──────────────────────────────────────────────
+const DEFAULT_TRADE_PERCENT = 10;
+const DEFAULT_MAX_POSITION_SIZE = parseFloat(process.env.MAX_POSITION_SIZE_USDC ?? "100");
+const DEFAULT_MIN_TRADE_SIZE = 1;
+const DEFAULT_DAILY_LOSS_LIMIT = 0;
+const DEFAULT_PAPER_BALANCE = parseFloat(process.env.PAPER_TRADING_BALANCE ?? "1000");
+
 const app = express();
 app.use(express.json());
 
@@ -189,18 +196,17 @@ interface TradingSettings {
 
 // Get all trading settings
 app.get("/api/trading-settings", (_req, res) => {
-  const tradePercent = getItem<number>("tradePercent") ?? 10;
-  const maxPositionSize = getItem<number>("maxPositionSize") ?? parseFloat(process.env.MAX_POSITION_SIZE_USDC ?? "100");
-  const minTradeSize = getItem<number>("minTradeSize") ?? 1;
-  const dailyLossLimit = getItem<number>("dailyLossLimit") ?? 0;
-  const simulatedBalance = parseFloat(process.env.PAPER_TRADING_BALANCE ?? "1000");
+  const tradePercent = getItem<number>("tradePercent") ?? DEFAULT_TRADE_PERCENT;
+  const maxPositionSize = getItem<number>("maxPositionSize") ?? DEFAULT_MAX_POSITION_SIZE;
+  const minTradeSize = getItem<number>("minTradeSize") ?? DEFAULT_MIN_TRADE_SIZE;
+  const dailyLossLimit = getItem<number>("dailyLossLimit") ?? DEFAULT_DAILY_LOSS_LIMIT;
   
   res.json({
     tradePercent,
     maxPositionSize,
     minTradeSize,
     dailyLossLimit,
-    currentBalance: simulatedBalance // For paper mode; live mode would get actual balance
+    currentBalance: DEFAULT_PAPER_BALANCE // For paper mode; live mode would get actual balance
   });
 });
 
@@ -277,10 +283,10 @@ app.post("/api/trading-settings", (req, res) => {
       success: true, 
       message: `Settings updated: ${updates.join(', ')}`,
       settings: {
-        tradePercent: getItem<number>("tradePercent") ?? 10,
-        maxPositionSize: getItem<number>("maxPositionSize") ?? 100,
-        minTradeSize: getItem<number>("minTradeSize") ?? 1,
-        dailyLossLimit: getItem<number>("dailyLossLimit") ?? 0
+        tradePercent: getItem<number>("tradePercent") ?? DEFAULT_TRADE_PERCENT,
+        maxPositionSize: getItem<number>("maxPositionSize") ?? DEFAULT_MAX_POSITION_SIZE,
+        minTradeSize: getItem<number>("minTradeSize") ?? DEFAULT_MIN_TRADE_SIZE,
+        dailyLossLimit: getItem<number>("dailyLossLimit") ?? DEFAULT_DAILY_LOSS_LIMIT
       }
     });
   } catch (err) {

@@ -226,7 +226,8 @@ function getDailyLoss(): number {
   let totalLoss = 0;
   for (const trade of trades) {
     if (trade.timestamp >= startOfDay && trade.pnl !== undefined && trade.pnl < 0) {
-      totalLoss += Math.abs(trade.pnl);
+      // pnl is negative, so we negate it to get a positive loss value
+      totalLoss -= trade.pnl;
     }
   }
   return totalLoss;
