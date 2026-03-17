@@ -102,15 +102,27 @@ export async function fetchMarkets(): Promise<Market[]> {
  * Supports both paper and live trading modes, controlled via dashboard.
  * Includes position tracking to prevent duplicate orders.
  * Skips resolved markets (where prices are 0 or 1).
- * Supports percentage-based position sizing.
+ * Supports percentage-based position sizing with max position size limit.
+ * Respects daily loss limits when configured.
  */
 export async function evaluateAndTrade(market: Market): Promise<void> {
   const minEdge = parseFloat(process.env.MIN_EDGE ?? "0.05");
-  const maxSize = parseFloat(process.env.MAX_POSITION_SIZE_USDC ?? "100");
   const isPaper = isPaperMode();
   
-  // Get percentage-based trading setting (1-100%)
+  // Get trading settings from dashboard (with fallbacks to env/defaults)
   const tradePercent = getItem<number>("tradePercent") ?? 10;
+  const maxPositionSize = getItem<number>("maxPositionSize") ?? parseFloat(process.env.MAX_POSITION_SIZE_USDC ?? "100");
+  const minTradeSize = getItem<number>("minTradeSize") ?? 1;
+  const dailyLossLimit = getItem<number>("dailyLossLimit") ?? 0;
+  
+  // Check daily loss limit
+  if (dailyLossLimit > 0) {
+    const dailyLoss = getDailyLoss();
+    if (dailyLoss >= dailyLossLimit) {
+      console.log(`[trading] Daily loss limit reached (${dailyLoss.toFixed(2)} >= ${dailyLossLimit} USDC). Skipping trades.`);
+      return;
+    }
+  }
         
   // Safety check
   if (!market.outcomes || !Array.isArray(market.outcomes) || !market.prices || !Array.isArray(market.prices)) {
@@ -124,25 +136,28 @@ export async function evaluateAndTrade(market: Market): Promise<void> {
   }
   
   // Calculate position size based on percentage of available balance
-  let effectiveMaxSize = maxSize;
+  // Always respect the max position size from dashboard
+  let effectiveMaxSize = maxPositionSize;
   if (!isPaper) {
     try {
       const balanceStr = await getTokenBalance("USDC");
       const balance = parseFloat(balanceStr);
       if (balance > 0) {
         const percentSize = (balance * tradePercent) / 100;
-        effectiveMaxSize = Math.min(percentSize, maxSize);
-        console.log(`[trading] Balance: ${balance.toFixed(2)} USDC, Trade percent: ${tradePercent}%, Effective max: ${effectiveMaxSize.toFixed(2)} USDC`);
+        // Take minimum of percentage-based size and max position size
+        effectiveMaxSize = Math.min(percentSize, maxPositionSize);
+        console.log(`[trading] Balance: ${balance.toFixed(2)} USDC, Trade %: ${tradePercent}%, Max: ${maxPositionSize} USDC, Effective: ${effectiveMaxSize.toFixed(2)} USDC`);
       }
     } catch (err) {
-      console.log("[trading] Could not get balance for percentage sizing, using default max");
+      console.log("[trading] Could not get balance for percentage sizing, using max position size");
     }
   } else {
     // For paper trading, use a simulated balance (configurable via env)
     const simulatedBalance = parseFloat(process.env.PAPER_TRADING_BALANCE ?? "1000");
     const percentSize = (simulatedBalance * tradePercent) / 100;
-    effectiveMaxSize = Math.min(percentSize, maxSize);
-    console.log(`[trading] Paper balance: ${simulatedBalance} USDC (simulated), Trade percent: ${tradePercent}%, Effective max: ${effectiveMaxSize.toFixed(2)} USDC`);
+    // Take minimum of percentage-based size and max position size
+    effectiveMaxSize = Math.min(percentSize, maxPositionSize);
+    console.log(`[trading] Paper balance: ${simulatedBalance} USDC, Trade %: ${tradePercent}%, Max: ${maxPositionSize} USDC, Effective: ${effectiveMaxSize.toFixed(2)} USDC`);
   }
 
   for (let i = 0; i < market.outcomes.length; i++) {
@@ -171,6 +186,12 @@ export async function evaluateAndTrade(market: Market): Promise<void> {
     // Calculate size based on edge, capped by effective max size
     const size = Math.min(effectiveMaxSize, Math.round(edge * effectiveMaxSize * 100) / 100);
     
+    // Skip if trade size is below minimum
+    if (size < minTradeSize) {
+      console.log(`[trading]   → SKIP (size ${size.toFixed(2)} USDC below minimum ${minTradeSize} USDC)`);
+      continue;
+    }
+    
     // Calculate simulated PnL for paper trades (for better visualization)
     // Uses deterministic calculation based on timestamp for reproducible results
     const tradeTimestamp = Date.now();
@@ -191,6 +212,24 @@ export async function evaluateAndTrade(market: Market): Promise<void> {
       pnl: simulatedPnl,
     });
   }
+}
+
+/**
+ * Get the total loss for today (negative PnL trades).
+ * Used to enforce daily loss limits.
+ */
+function getDailyLoss(): number {
+  const trades = getAllTrades();
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  
+  let totalLoss = 0;
+  for (const trade of trades) {
+    if (trade.timestamp >= startOfDay && trade.pnl !== undefined && trade.pnl < 0) {
+      totalLoss += Math.abs(trade.pnl);
+    }
+  }
+  return totalLoss;
 }
 
 /**

@@ -177,6 +177,118 @@ app.post("/api/trade-percent", (req, res) => {
   }
 });
 
+// ── Trading Settings API endpoints ─────────────────────────────────────────
+
+interface TradingSettings {
+  tradePercent: number;
+  maxPositionSize: number;
+  minTradeSize: number;
+  dailyLossLimit: number;
+  currentBalance: number;
+}
+
+// Get all trading settings
+app.get("/api/trading-settings", (_req, res) => {
+  const tradePercent = getItem<number>("tradePercent") ?? 10;
+  const maxPositionSize = getItem<number>("maxPositionSize") ?? parseFloat(process.env.MAX_POSITION_SIZE_USDC ?? "100");
+  const minTradeSize = getItem<number>("minTradeSize") ?? 1;
+  const dailyLossLimit = getItem<number>("dailyLossLimit") ?? 0;
+  const simulatedBalance = parseFloat(process.env.PAPER_TRADING_BALANCE ?? "1000");
+  
+  res.json({
+    tradePercent,
+    maxPositionSize,
+    minTradeSize,
+    dailyLossLimit,
+    currentBalance: simulatedBalance // For paper mode; live mode would get actual balance
+  });
+});
+
+// Update trading settings (partial update)
+app.post("/api/trading-settings", (req, res) => {
+  try {
+    const { maxPositionSize, minTradeSize, dailyLossLimit, tradePercent } = req.body as Partial<TradingSettings>;
+    
+    const updates: string[] = [];
+    
+    // Update max position size
+    if (maxPositionSize !== undefined) {
+      if (maxPositionSize < 1 || maxPositionSize > 100000) {
+        res.status(400).json({ 
+          success: false, 
+          error: 'Invalid maxPositionSize. Must be between 1 and 100,000 USDC.' 
+        });
+        return;
+      }
+      setItem("maxPositionSize", maxPositionSize, true);
+      updates.push(`maxPositionSize=${maxPositionSize}`);
+    }
+    
+    // Update min trade size
+    if (minTradeSize !== undefined) {
+      if (minTradeSize < 0.1 || minTradeSize > 1000) {
+        res.status(400).json({ 
+          success: false, 
+          error: 'Invalid minTradeSize. Must be between 0.1 and 1,000 USDC.' 
+        });
+        return;
+      }
+      setItem("minTradeSize", minTradeSize, true);
+      updates.push(`minTradeSize=${minTradeSize}`);
+    }
+    
+    // Update daily loss limit
+    if (dailyLossLimit !== undefined) {
+      if (dailyLossLimit < 0 || dailyLossLimit > 100000) {
+        res.status(400).json({ 
+          success: false, 
+          error: 'Invalid dailyLossLimit. Must be between 0 and 100,000 USDC.' 
+        });
+        return;
+      }
+      setItem("dailyLossLimit", dailyLossLimit, true);
+      updates.push(`dailyLossLimit=${dailyLossLimit}`);
+    }
+    
+    // Update trade percent
+    if (tradePercent !== undefined) {
+      if (tradePercent < 1 || tradePercent > 100) {
+        res.status(400).json({ 
+          success: false, 
+          error: 'Invalid tradePercent. Must be between 1 and 100.' 
+        });
+        return;
+      }
+      setItem("tradePercent", tradePercent, true);
+      updates.push(`tradePercent=${tradePercent}%`);
+    }
+    
+    if (updates.length === 0) {
+      res.status(400).json({ 
+        success: false, 
+        error: 'No valid settings provided.' 
+      });
+      return;
+    }
+    
+    console.log(`[settings] Trading settings updated: ${updates.join(', ')}`);
+    
+    res.json({ 
+      success: true, 
+      message: `Settings updated: ${updates.join(', ')}`,
+      settings: {
+        tradePercent: getItem<number>("tradePercent") ?? 10,
+        maxPositionSize: getItem<number>("maxPositionSize") ?? 100,
+        minTradeSize: getItem<number>("minTradeSize") ?? 1,
+        dailyLossLimit: getItem<number>("dailyLossLimit") ?? 0
+      }
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ success: false, error: message });
+  }
+});
+
 // ── HTTP + WebSocket server ────────────────────────────────────────────────
 
 const server = http.createServer(app);

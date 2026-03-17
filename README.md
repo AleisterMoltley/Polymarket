@@ -43,6 +43,33 @@ Think of it like having a very attentive squirrel who never sleeps and is REALLY
 
 ---
 
+## 🎛️ Dashboard Features
+
+The bot comes with a fancy web dashboard where you can control everything! Here's what you can do:
+
+![Dashboard Trading Settings](https://github.com/user-attachments/assets/de7d7545-18df-4aba-bc05-12b57f4cfdea)
+
+### Trading Mode Toggle
+- **📝 Paper Mode**: Practice trading without real money (recommended for beginners!)
+- **🔴 Live Mode**: Real trading with real money (be careful!)
+
+### Trading Settings
+
+| Setting | Description |
+|---------|-------------|
+| **Trade Size %** | What percentage of your balance to use per trade (1-100%) |
+| **Max Position Size** | Maximum USDC per trade - hard limit that overrides the percentage |
+| **Min Trade Size** | Skip trades below this amount (avoid dust trades) |
+| **Daily Loss Limit** | Stop trading automatically if you lose this much in a day (0 = disabled) |
+
+### Other Dashboard Features
+- 📊 **Live Stats**: See total trades, open/filled orders, paper vs live trades
+- 📈 **Performance Summary**: Wins, losses, and win rate at a glance
+- 📉 **PnL History Chart**: Visual chart of your profit/loss over time
+- 🖥️ **Terminal**: Real-time bot activity log
+
+---
+
 ## 💻 First Things First - Opening the Magic Black Box (Terminal)
 
 The **Terminal** is like a text-message conversation with your computer. Instead of clicking buttons, you TYPE what you want it to do. Scary? Nah! It's actually pretty fun once ya get the hang of it!
