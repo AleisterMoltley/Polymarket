@@ -1,4 +1,5 @@
 import { setItem, getItem, saveStore } from "../utils/jsonStore";
+import { logTrade, type TradeLogData } from "../utils/logger";
 
 export interface TradeRecord {
   id: string;
@@ -20,6 +21,19 @@ export function recordTrade(trade: TradeRecord): void {
   const trades = getItem<TradeRecord[]>(TRADES_KEY) ?? [];
   trades.push(trade);
   setItem(TRADES_KEY, trades, true);
+  
+  // Broadcast trade to WebSocket clients
+  const tradeData: TradeLogData = {
+    id: trade.id,
+    side: trade.side,
+    outcome: trade.outcome,
+    price: trade.price,
+    size: trade.size,
+    paper: trade.paper,
+    pnl: trade.pnl,
+    timestamp: trade.timestamp,
+  };
+  logTrade(tradeData);
 }
 
 /** Return all recorded trades. */

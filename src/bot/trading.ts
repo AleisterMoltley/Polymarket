@@ -102,11 +102,15 @@ export async function fetchMarkets(): Promise<Market[]> {
  * Supports both paper and live trading modes, controlled via dashboard.
  * Includes position tracking to prevent duplicate orders.
  * Skips resolved markets (where prices are 0 or 1).
+ * Supports percentage-based position sizing.
  */
 export async function evaluateAndTrade(market: Market): Promise<void> {
   const minEdge = parseFloat(process.env.MIN_EDGE ?? "0.05");
   const maxSize = parseFloat(process.env.MAX_POSITION_SIZE_USDC ?? "100");
   const isPaper = isPaperMode();
+  
+  // Get percentage-based trading setting (1-100%)
+  const tradePercent = getItem<number>("tradePercent") ?? 10;
         
   // Safety check
   if (!market.outcomes || !Array.isArray(market.outcomes) || !market.prices || !Array.isArray(market.prices)) {
@@ -117,6 +121,28 @@ export async function evaluateAndTrade(market: Market): Promise<void> {
   const hasExtremePrice = market.prices.some((p: number) => p === 0 || p === 1);
   if (hasExtremePrice) {
     return; // Skip this market - it's resolved or near-resolved
+  }
+  
+  // Calculate position size based on percentage of available balance
+  let effectiveMaxSize = maxSize;
+  if (!isPaper) {
+    try {
+      const balanceStr = await getTokenBalance("USDC");
+      const balance = parseFloat(balanceStr);
+      if (balance > 0) {
+        const percentSize = (balance * tradePercent) / 100;
+        effectiveMaxSize = Math.min(percentSize, maxSize);
+        console.log(`[trading] Balance: ${balance.toFixed(2)} USDC, Trade percent: ${tradePercent}%, Effective max: ${effectiveMaxSize.toFixed(2)} USDC`);
+      }
+    } catch (err) {
+      console.log("[trading] Could not get balance for percentage sizing, using default max");
+    }
+  } else {
+    // For paper trading, use a simulated balance (configurable via env)
+    const simulatedBalance = parseFloat(process.env.PAPER_TRADING_BALANCE ?? "1000");
+    const percentSize = (simulatedBalance * tradePercent) / 100;
+    effectiveMaxSize = Math.min(percentSize, maxSize);
+    console.log(`[trading] Paper balance: ${simulatedBalance} USDC (simulated), Trade percent: ${tradePercent}%, Effective max: ${effectiveMaxSize.toFixed(2)} USDC`);
   }
 
   for (let i = 0; i < market.outcomes.length; i++) {
@@ -142,13 +168,19 @@ export async function evaluateAndTrade(market: Market): Promise<void> {
       continue;
     }
 
-    const size = Math.min(maxSize, Math.round(edge * maxSize * 100) / 100);
+    // Calculate size based on edge, capped by effective max size
+    const size = Math.min(effectiveMaxSize, Math.round(edge * effectiveMaxSize * 100) / 100);
+    
+    // Calculate simulated PnL for paper trades (for better visualization)
+    // Uses deterministic calculation based on timestamp for reproducible results
+    const tradeTimestamp = Date.now();
+    const simulatedPnl = isPaper ? calculateSimulatedPnL(size, price, edge, tradeTimestamp) : undefined;
 
-    console.log(`[paper-trade] BUY ${size} USDC of "${outcome}" @ ${price}`);
+    console.log(`[${isPaper ? 'paper' : 'live'}-trade] BUY ${size} USDC of "${outcome}" @ ${price}${simulatedPnl !== undefined ? ` (simulated PnL: ${simulatedPnl.toFixed(2)})` : ''}`);
 
     recordTrade({
       id: newId(),
-      timestamp: Date.now(),
+      timestamp: tradeTimestamp,
       market: market.question,
       outcome,
       side: "BUY",
@@ -156,7 +188,32 @@ export async function evaluateAndTrade(market: Market): Promise<void> {
       price,
       paper: isPaper,
       status: "FILLED",
+      pnl: simulatedPnl,
     });
+  }
+}
+
+/**
+ * Calculate simulated PnL for paper trades.
+ * Uses a deterministic probability model based on edge and timestamp
+ * to determine win/loss for reproducible results.
+ */
+function calculateSimulatedPnL(size: number, price: number, edge: number, timestamp?: number): number {
+  // Use timestamp for deterministic randomness (allows reproducible results)
+  const seed = timestamp ?? Date.now();
+  const pseudoRandom = ((seed * 9301 + 49297) % 233280) / 233280;
+  
+  // Higher edge = higher probability of winning
+  // Base win probability is 50%, adjusted by edge
+  const winProbability = Math.min(0.5 + edge, 0.9); // Cap at 90%
+  const isWinner = pseudoRandom < winProbability;
+  
+  if (isWinner) {
+    // Won the trade: profit is size * (1/price - 1) for binary markets
+    return Math.round(size * (1 / price - 1) * 100) / 100;
+  } else {
+    // Lost the trade: lose the position value
+    return -Math.round(size * 100) / 100;
   }
 }
 

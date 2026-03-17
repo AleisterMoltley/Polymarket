@@ -4,7 +4,8 @@ import http from "http";
 import path from "path";
 import { WebSocketServer, WebSocket } from "ws";
 
-import { loadStore, saveStore } from "./utils/jsonStore";
+import { loadStore, saveStore, getItem, setItem } from "./utils/jsonStore";
+import { setLogBroadcastCallback, setTradeBroadcastCallback, type LogType, type TradeLogData } from "./utils/logger";
 import adminRouter from "./admin/tabs";
 import { runTradingLoop, stopTradingLoop } from "./bot/trading";
 import { getStats, flushStats } from "./admin/stats";
@@ -142,10 +143,53 @@ app.post("/api/trading-mode/toggle", (_req, res) => {
   }
 });
 
+// ── Trade Percent API endpoint ─────────────────────────────────────────────
+
+// Get current trade percent setting
+app.get("/api/trade-percent", (_req, res) => {
+  const percent = getItem<number>("tradePercent") ?? 10;
+  res.json({ percent });
+});
+
+// Set trade percent (1-100%)
+app.post("/api/trade-percent", (req, res) => {
+  try {
+    const { percent } = req.body as { percent?: number };
+    
+    if (percent === undefined || percent < 1 || percent > 100) {
+      res.status(400).json({ 
+        success: false, 
+        error: 'Invalid percent. Must be between 1 and 100.' 
+      });
+      return;
+    }
+    
+    setItem("tradePercent", percent, true);
+    
+    res.json({ 
+      success: true, 
+      message: `Trade percent set to ${percent}%`,
+      percent 
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ success: false, error: message });
+  }
+});
+
 // ── HTTP + WebSocket server ────────────────────────────────────────────────
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
+
+// Set up logger callbacks for WebSocket broadcasting
+setLogBroadcastCallback((type: LogType, message: string) => {
+  broadcast("log", { type, message, timestamp: Date.now() });
+});
+
+setTradeBroadcastCallback((trade: TradeLogData) => {
+  broadcast("trade", trade);
+});
 
 wss.on("connection", (ws: WebSocket) => {
   console.log("[ws] Client connected");
