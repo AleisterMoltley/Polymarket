@@ -113,6 +113,30 @@
           <span>% of balance</span>
           <span class="percent-info">(Current balance: <strong id="current-balance">—</strong> USDC • Trade size: <strong id="calculated-size">—</strong> USDC)</span>
         </div>
+        
+        <!-- Max Position Size Setting -->
+        <div class="percent-trade-section" style="margin-top: 12px;">
+          <label>Max Position Size:</label>
+          <input type="number" id="max-position-size" min="1" max="100000" value="100" step="1" onchange="updateMaxPositionSize(this.value)" />
+          <span>USDC</span>
+          <span class="percent-info">(Maximum amount per trade • Overrides % if lower)</span>
+        </div>
+        
+        <!-- Min Trade Size Setting -->
+        <div class="percent-trade-section" style="margin-top: 12px;">
+          <label>Min Trade Size:</label>
+          <input type="number" id="min-trade-size" min="0.1" max="1000" value="1" step="0.1" onchange="updateMinTradeSize(this.value)" />
+          <span>USDC</span>
+          <span class="percent-info">(Skip trades below this amount)</span>
+        </div>
+        
+        <!-- Daily Loss Limit Setting -->
+        <div class="percent-trade-section" style="margin-top: 12px;">
+          <label>Daily Loss Limit:</label>
+          <input type="number" id="daily-loss-limit" min="0" max="100000" value="0" step="1" onchange="updateDailyLossLimit(this.value)" />
+          <span>USDC</span>
+          <span class="percent-info">(Stop trading if daily losses exceed this • 0 = disabled)</span>
+        </div>
       </div>
 
       <div class="dashboard-grid">
@@ -292,6 +316,7 @@
     ws.addEventListener('open', () => {
       addLogEntry({ type: 'info', message: 'Connected to bot WebSocket', timestamp: Date.now() });
       loadTradingMode();
+      loadTradingSettings();
       loadAnalyticsSummary();
     });
 
@@ -349,19 +374,157 @@
       tradePercent = Math.max(1, Math.min(100, parseInt(percent) || 10));
       document.getElementById('trade-percent').value = tradePercent;
       
-      // Update calculated size
-      const calculatedSize = (currentBalance * tradePercent / 100).toFixed(2);
-      document.getElementById('calculated-size').textContent = calculatedSize;
+      // Update calculated size using helper (will be defined after maxPositionSize)
+      if (typeof updateCalculatedSizeDisplay === 'function') {
+        updateCalculatedSizeDisplay();
+      } else {
+        const calculatedSize = Math.min(currentBalance * tradePercent / 100, maxPositionSize || 100).toFixed(2);
+        document.getElementById('calculated-size').textContent = calculatedSize;
+      }
       
       // Save to server
       try {
-        await fetch('/api/trade-percent', {
+        const res = await fetch('/api/trade-percent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
           body: JSON.stringify({ percent: tradePercent })
         });
+        if (res.ok) {
+          addLogEntry({ type: 'info', message: `Trade size set to ${tradePercent}% of balance`, timestamp: Date.now() });
+        } else {
+          const data = await res.json();
+          addLogEntry({ type: 'error', message: `Failed to save trade percent: ${data.error || 'Unknown error'}`, timestamp: Date.now() });
+        }
       } catch (err) {
         console.error('Failed to save trade percent:', err);
+        addLogEntry({ type: 'error', message: `Failed to save trade percent: ${err.message}`, timestamp: Date.now() });
+      }
+    }
+
+    // ── Max Position Size Functions ─────────────────────────────────────────────
+    let maxPositionSize = 100;
+    
+    // Helper function to calculate effective trade size
+    function calculateEffectiveTradeSize(balance, percent, maxSize) {
+      const percentSize = balance * percent / 100;
+      return Math.min(percentSize, maxSize);
+    }
+    
+    // Helper function to update the calculated size display
+    function updateCalculatedSizeDisplay() {
+      const calculatedSize = calculateEffectiveTradeSize(currentBalance, tradePercent, maxPositionSize).toFixed(2);
+      document.getElementById('calculated-size').textContent = calculatedSize;
+    }
+    
+    async function loadTradingSettings() {
+      try {
+        const res = await fetch('/api/trading-settings');
+        if (!res.ok) {
+          console.error('Failed to load trading settings:', res.statusText);
+          return;
+        }
+        const data = await res.json();
+        
+        // Update trade percent
+        tradePercent = data.tradePercent || 10;
+        document.getElementById('trade-percent').value = tradePercent;
+        
+        // Update max position size
+        maxPositionSize = data.maxPositionSize || 100;
+        document.getElementById('max-position-size').value = maxPositionSize;
+        
+        // Update min trade size
+        const minTradeSize = data.minTradeSize || 1;
+        document.getElementById('min-trade-size').value = minTradeSize;
+        
+        // Update daily loss limit
+        const dailyLossLimit = data.dailyLossLimit || 0;
+        document.getElementById('daily-loss-limit').value = dailyLossLimit;
+        
+        // Update current balance
+        currentBalance = data.currentBalance || 1000;
+        document.getElementById('current-balance').textContent = currentBalance.toFixed(2);
+        
+        // Update calculated size using helper
+        updateCalculatedSizeDisplay();
+      } catch (err) {
+        console.error('Failed to load trading settings:', err);
+      }
+    }
+    
+    async function updateMaxPositionSize(size) {
+      maxPositionSize = Math.max(1, Math.min(100000, parseFloat(size) || 100));
+      document.getElementById('max-position-size').value = maxPositionSize;
+      
+      // Update calculated size using helper
+      updateCalculatedSizeDisplay();
+      
+      // Save to server
+      try {
+        const res = await fetch('/api/trading-settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+          body: JSON.stringify({ maxPositionSize })
+        });
+        if (res.ok) {
+          addLogEntry({ type: 'info', message: `Max position size set to ${maxPositionSize} USDC`, timestamp: Date.now() });
+        } else {
+          const data = await res.json();
+          addLogEntry({ type: 'error', message: `Failed to save max position size: ${data.error || 'Unknown error'}`, timestamp: Date.now() });
+        }
+      } catch (err) {
+        console.error('Failed to save max position size:', err);
+        addLogEntry({ type: 'error', message: `Failed to save max position size: ${err.message}`, timestamp: Date.now() });
+      }
+    }
+    
+    async function updateMinTradeSize(size) {
+      const minTradeSize = Math.max(0.1, Math.min(1000, parseFloat(size) || 1));
+      document.getElementById('min-trade-size').value = minTradeSize;
+      
+      // Save to server
+      try {
+        const res = await fetch('/api/trading-settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+          body: JSON.stringify({ minTradeSize })
+        });
+        if (res.ok) {
+          addLogEntry({ type: 'info', message: `Min trade size set to ${minTradeSize} USDC`, timestamp: Date.now() });
+        } else {
+          const data = await res.json();
+          addLogEntry({ type: 'error', message: `Failed to save min trade size: ${data.error || 'Unknown error'}`, timestamp: Date.now() });
+        }
+      } catch (err) {
+        console.error('Failed to save min trade size:', err);
+        addLogEntry({ type: 'error', message: `Failed to save min trade size: ${err.message}`, timestamp: Date.now() });
+      }
+    }
+    
+    async function updateDailyLossLimit(limit) {
+      const dailyLossLimit = Math.max(0, Math.min(100000, parseFloat(limit) || 0));
+      document.getElementById('daily-loss-limit').value = dailyLossLimit;
+      
+      // Save to server
+      try {
+        const res = await fetch('/api/trading-settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET },
+          body: JSON.stringify({ dailyLossLimit })
+        });
+        if (res.ok) {
+          if (dailyLossLimit > 0) {
+            addLogEntry({ type: 'info', message: `Daily loss limit set to ${dailyLossLimit} USDC`, timestamp: Date.now() });
+          } else {
+            addLogEntry({ type: 'info', message: 'Daily loss limit disabled', timestamp: Date.now() });
+          }
+        } else {
+          const data = await res.json();
+          addLogEntry({ type: 'error', message: `Failed to save daily loss limit: ${data.error || 'Unknown error'}`, timestamp: Date.now() });
+        }
+      } catch (err) {
+        console.error('Failed to save daily loss limit:', err);
+        addLogEntry({ type: 'error', message: `Failed to save daily loss limit: ${err.message}`, timestamp: Date.now() });
       }
     }
 
